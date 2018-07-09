@@ -5,7 +5,8 @@ var fs = require('fs'),
     gulp = require('gulp'),
     es6 = require('gulp-babel'),
     uglify = require('gulp-uglify'),
-    cleanCss = require('gulp-clean-css'),
+    sass = require('gulp-sass');
+cleanCss = require('gulp-clean-css'),
     htmlMin = require('gulp-htmlmin'),
     server = require('gulp-webserver'),
     concat = require('gulp-concat'),
@@ -57,3 +58,39 @@ gulp.task('devScss', function() {
 gulp.task('watch', function() {
     gulp.watch('src/**/*.scss', ['devScss']);
 })
+
+// 开发环境
+
+gulp.task('dev', ['devScss', 'devJs']);
+
+// 线上环境scss
+
+gulp.task('buildScss', function() {
+    gulp.src('src/**/*.css')
+        .pipe(sass())
+        .pipe(concat('all.css'))
+        .pipe(cleanCss())
+        .pipe(gulp.dest('build/css'));
+})
+
+// 线上环境js
+
+gulp.task('buildJs', function() {
+    gulp.src(['src/**/*.js', '!src/**/*.min.js'])
+        .pipe(uglify())
+        .pipe(concat('all.js'))
+        .pipe(gulp.dest('build/js'));
+})
+
+
+// 线上环境html
+
+gulp.task('copyHtml', function() {
+    gulp.src('src/**/*.html')
+        .pipe(htmlMin())
+        .pipe(gulp.dest('build/html'));
+})
+
+// 线上环境 
+
+gulp.task('build', ['buildScss', 'buildJs']);
